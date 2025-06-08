@@ -1,9 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 
 # Konfigurasi halaman
 st.set_page_config(page_title="HR Analytics Dashboard", layout="wide")
@@ -109,37 +106,32 @@ Interpretasi Korelasi:
 - Nilai mendekati 0: Tidak ada korelasi
 """)
 
-# Analisis Prediktif
-st.subheader("🔮 Analisis Prediktif Attrition")
+# Analisis Statistik
+st.subheader("📊 Analisis Statistik")
 
-# Persiapan data untuk model
-le = LabelEncoder()
-df_model = df.copy()
-categorical_cols = ['Gender', 'Department', 'JobRole', 'MaritalStatus']
-for col in categorical_cols:
-    df_model[col] = le.fit_transform(df_model[col])
+# Analisis berdasarkan Departemen
+st.write("Analisis berdasarkan Departemen")
+dept_analysis = df.groupby('Department').agg({
+    'Attrition': lambda x: (x == 'Yes').mean() * 100,
+    'MonthlyIncome': 'mean',
+    'JobSatisfaction': 'mean',
+    'YearsAtCompany': 'mean'
+}).round(2)
 
-# Fitur untuk prediksi
-features = ['Age', 'JobLevel', 'MonthlyIncome', 'JobSatisfaction', 
-           'YearsAtCompany', 'YearsInCurrentRole', 'YearsSinceLastPromotion']
-X = df_model[features]
-y = df_model['Attrition'].map({'Yes': 1, 'No': 0})
+st.write("Statistik per Departemen:")
+st.dataframe(dept_analysis)
 
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Analisis berdasarkan Level Jabatan
+st.write("Analisis berdasarkan Level Jabatan")
+job_level_analysis = df.groupby('JobLevel').agg({
+    'Attrition': lambda x: (x == 'Yes').mean() * 100,
+    'MonthlyIncome': 'mean',
+    'JobSatisfaction': 'mean',
+    'YearsAtCompany': 'mean'
+}).round(2)
 
-# Train model
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
-
-# Tampilkan feature importance
-feature_importance = pd.DataFrame({
-    'Fitur': features,
-    'Penting': model.feature_importances_
-}).sort_values('Penting', ascending=False)
-
-st.write("Faktor-faktor yang Mempengaruhi Attrition")
-st.bar_chart(feature_importance.set_index('Fitur'))
+st.write("Statistik per Level Jabatan:")
+st.dataframe(job_level_analysis)
 
 # Penjelasan Dashboard
 with st.expander("ℹ️ Penjelasan Dashboard"):
@@ -151,21 +143,47 @@ with st.expander("ℹ️ Penjelasan Dashboard"):
     Dashboard ini dirancang untuk membantu manajemen dan HR dalam mengambil keputusan strategis terkait pengelolaan karyawan dan peningkatan kinerja organisasi. Berikut penjelasan fungsi masing-masing bagian dashboard:
 
     - **Filter Data (Sidebar):**  
-      Pengguna dapat menganalisis pada departemen, usia, jenis kelamin, dan level jabatan tertentu. Dengan filter ini, manajemen dapat mengidentifikasi masalah atau peluang spesifik pada kelompok karyawan tertentu.
+      Pengguna dapat menganalisis pada departemen, usia, jenis kelamin, dan level jabatan tertentu. Dengan filter ini, manajemen dapat mengidentifikasi masalah atau peluang spesifik pada kelompok karyawan tertentu. Filter ini memungkinkan analisis yang lebih fokus dan mendalam untuk setiap segmen karyawan.
 
     - **KPI Cards:**  
-      Menampilkan indikator kunci seperti tingkat attrition, rata-rata gaji bulanan, rata-rata kepuasan kerja, dan rata-rata lama bekerja. Informasi ini membantu manajemen memantau kesehatan organisasi secara umum dan mendeteksi area yang memerlukan perhatian khusus.
+      Menampilkan indikator kunci yang penting untuk monitoring kesehatan organisasi:
+      - Tingkat Attrition: Persentase karyawan yang keluar dari perusahaan
+      - Rata-rata Gaji Bulanan: Indikator kompensasi dan struktur gaji
+      - Rata-rata Kepuasan Kerja: Ukuran kepuasan karyawan (skala 1-5)
+      - Rata-rata Lama Bekerja: Indikator retensi dan loyalitas karyawan
 
     - **Visualisasi Attrition & Distribusi Usia:**  
-      Bar chart memberikan gambaran cepat tentang proporsi karyawan yang keluar dan distribusi usia karyawan. Visualisasi ini membantu memahami kelompok usia mana yang paling rentan terhadap attrition dan merancang program retensi yang tepat sasaran.
+      Menampilkan dua visualisasi penting:
+      - Persentase Attrition: Menunjukkan proporsi karyawan yang keluar vs tetap
+      - Distribusi Usia vs Attrition: Membantu mengidentifikasi kelompok usia yang paling rentan terhadap attrition
 
     - **Kepuasan Kerja & Distribusi Gaji:**  
-      Bar chart memperlihatkan rata-rata kepuasan kerja per departemen dan rata-rata gaji per level jabatan. Data ini membantu manajemen dalam mengevaluasi keadilan kompensasi dan efektivitas program peningkatan kepuasan kerja.
+      Menyajikan analisis komparatif:
+      - Kepuasan Kerja per Departemen: Membandingkan tingkat kepuasan antar departemen
+      - Distribusi Gaji per Level Jabatan: Menunjukkan struktur kompensasi berdasarkan level jabatan
 
     - **Analisis Korelasi:**  
-      Menampilkan matriks korelasi antar variabel numerik dalam bentuk tabel. Nilai korelasi menunjukkan kekuatan hubungan antar variabel, membantu mengidentifikasi faktor-faktor yang saling terkait dan mempengaruhi attrition atau performa karyawan.
+      Menampilkan matriks korelasi antar variabel numerik yang membantu mengidentifikasi:
+      - Hubungan antara variabel-variabel penting
+      - Faktor-faktor yang saling terkait
+      - Pola dan tren dalam data karyawan
 
-    - **Analisis Prediktif Attrition:**  
-      Menggunakan model machine learning untuk mengidentifikasi faktor-faktor utama yang mempengaruhi kemungkinan karyawan keluar. Hasil ini dapat digunakan untuk merancang intervensi yang lebih efektif, seperti pelatihan, promosi, atau penyesuaian gaji.
+    - **Analisis Statistik:**  
+      Menyajikan analisis mendalam berdasarkan:
+      - Departemen: Menampilkan statistik attrition, gaji, kepuasan kerja, dan lama bekerja per departemen
+      - Level Jabatan: Menunjukkan perbandingan metrik penting antar level jabatan
+      
+      Analisis ini membantu manajemen dalam:
+      - Mengidentifikasi departemen dengan masalah attrition tinggi
+      - Mengevaluasi struktur kompensasi
+      - Merancang program retensi yang tepat sasaran
+      - Mengoptimalkan alokasi sumber daya
+
+    Dashboard ini dirancang untuk mendukung pengambilan keputusan berbasis data dalam:
+    1. Perencanaan SDM
+    2. Pengembangan program retensi
+    3. Evaluasi kebijakan kompensasi
+    4. Identifikasi area yang memerlukan perhatian khusus
+    5. Pengukuran efektivitas program HR
     """)
 
