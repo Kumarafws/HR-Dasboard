@@ -99,7 +99,15 @@ st.subheader("🔥 Analisis Korelasi")
 numeric_cols = df.select_dtypes(include=[np.number]).columns
 correlation = df[numeric_cols].corr()
 st.write("Korelasi antar Variabel Numerik")
-st.dataframe(correlation.style.background_gradient(cmap='RdBu'))
+st.dataframe(correlation.round(2))
+
+# Tambahkan penjelasan korelasi
+st.write("""
+Interpretasi Korelasi:
+- Nilai mendekati 1: Korelasi positif kuat
+- Nilai mendekati -1: Korelasi negatif kuat
+- Nilai mendekati 0: Tidak ada korelasi
+""")
 
 # Analisis Prediktif
 st.subheader("🔮 Analisis Prediktif Attrition")
@@ -149,13 +157,13 @@ with st.expander("ℹ️ Penjelasan Dashboard"):
       Menampilkan indikator kunci seperti tingkat attrition, rata-rata gaji bulanan, rata-rata kepuasan kerja, dan rata-rata lama bekerja. Informasi ini membantu manajemen memantau kesehatan organisasi secara umum dan mendeteksi area yang memerlukan perhatian khusus.
 
     - **Visualisasi Attrition & Distribusi Usia:**  
-      Bar chart memberikan gambaran cepat tentang proporsi karyawan yang keluar dan distribusi usia karyawan. Ini penting untuk memahami kelompok usia mana yang paling rentan terhadap attrition dan merancang program retensi yang tepat sasaran.
+      Bar chart memberikan gambaran cepat tentang proporsi karyawan yang keluar dan distribusi usia karyawan. Visualisasi ini membantu memahami kelompok usia mana yang paling rentan terhadap attrition dan merancang program retensi yang tepat sasaran.
 
     - **Kepuasan Kerja & Distribusi Gaji:**  
-      Bar chart memperlihatkan variasi kepuasan kerja dan distribusi gaji di berbagai departemen dan level jabatan. Data ini membantu manajemen dalam mengevaluasi keadilan kompensasi dan efektivitas program peningkatan kepuasan kerja.
+      Bar chart memperlihatkan rata-rata kepuasan kerja per departemen dan rata-rata gaji per level jabatan. Data ini membantu manajemen dalam mengevaluasi keadilan kompensasi dan efektivitas program peningkatan kepuasan kerja.
 
-    - **Heatmap Korelasi:**  
-      Menunjukkan hubungan antar variabel numerik, seperti hubungan antara lama bekerja, pendapatan, dan kepuasan kerja. Korelasi ini dapat digunakan untuk menemukan faktor-faktor yang paling berpengaruh terhadap attrition atau performa.
+    - **Analisis Korelasi:**  
+      Menampilkan matriks korelasi antar variabel numerik dalam bentuk tabel. Nilai korelasi menunjukkan kekuatan hubungan antar variabel, membantu mengidentifikasi faktor-faktor yang saling terkait dan mempengaruhi attrition atau performa karyawan.
 
     - **Analisis Prediktif Attrition:**  
       Menggunakan model machine learning untuk mengidentifikasi faktor-faktor utama yang mempengaruhi kemungkinan karyawan keluar. Hasil ini dapat digunakan untuk merancang intervensi yang lebih efektif, seperti pelatihan, promosi, atau penyesuaian gaji.
