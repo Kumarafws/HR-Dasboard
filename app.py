@@ -4,7 +4,7 @@ import numpy as np
 
 
 st.set_page_config(page_title="HR Analytics Dashboard", layout="wide")
-st.title("📊 HR Analytics Dashboard")
+st.title("HR Analytics Dashboard")
 
 
 @st.cache_data
@@ -42,7 +42,7 @@ if selected_job_level != "Semua":
     df = df[df['JobLevel'] == int(selected_job_level)]
 df = df[(df['Age'] >= selected_age_range[0]) & (df['Age'] <= selected_age_range[1])]
 
-st.subheader("📈 Key Performance Indicators")
+st.subheader("Key Performance Indicators")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
@@ -63,7 +63,7 @@ with col4:
 
 st.divider()
 
-st.subheader("📊 Analisis Visual")
+st.subheader("Analisis Visual")
 
 col1, col2 = st.columns(2)
 
@@ -93,7 +93,7 @@ with col4:
 
 st.divider()
 
-st.subheader("🔥 Analisis Korelasi")
+st.subheader("Analisis Korelasi")
 numeric_cols = df.select_dtypes(include=[np.number]).columns
 correlation = df[numeric_cols].corr()
 st.write("Korelasi antar Variabel Numerik")
@@ -108,7 +108,7 @@ Interpretasi Korelasi:
 
 st.divider()
 
-st.subheader("📊 Analisis Statistik")
+st.subheader("Analisis Statistik")
 
 st.write("Analisis berdasarkan Departemen")
 dept_analysis = df.groupby('Department').agg({
@@ -134,7 +134,7 @@ st.dataframe(job_level_analysis)
 
 st.divider()
 
-with st.expander("ℹ️ Penjelasan Dashboard"):
+with st.expander("Penjelasan Dashboard"):
     st.markdown("""
     NAMA ANGOTA KELOMPOK :
     - KUMARA FAWWAS ABHISTA (2200016100)
