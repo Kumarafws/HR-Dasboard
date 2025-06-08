@@ -2,38 +2,38 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
-# Konfigurasi halaman
+
 st.set_page_config(page_title="HR Analytics Dashboard", layout="wide")
 st.title("📊 HR Analytics Dashboard")
 
-# Load data
+
 @st.cache_data
 def load_data():
     return pd.read_csv("HR_Analytics.csv")
 
 df = load_data()
 
-# Sidebar untuk filter
+
 st.sidebar.header("Filter Data")
 
-# Filter Departemen
+
 departments = df['Department'].unique()
 selected_dept = st.sidebar.selectbox("Pilih Departemen", options=["Semua"] + list(departments))
 
-# Filter Usia
+
 min_age = int(df['Age'].min())
 max_age = int(df['Age'].max())
 selected_age_range = st.sidebar.slider("Rentang Usia", min_age, max_age, (min_age, max_age))
 
-# Filter Jenis Kelamin
+
 gender_options = ["Semua"] + list(df['Gender'].unique())
 selected_gender = st.sidebar.selectbox("Jenis Kelamin", options=gender_options)
 
-# Filter Level Jabatan
+
 job_levels = ["Semua"] + sorted(list(df['JobLevel'].unique()))
 selected_job_level = st.sidebar.selectbox("Level Jabatan", options=job_levels)
 
-# Terapkan filter
+
 if selected_dept != "Semua":
     df = df[df['Department'] == selected_dept]
 if selected_gender != "Semua":
@@ -42,7 +42,6 @@ if selected_job_level != "Semua":
     df = df[df['JobLevel'] == int(selected_job_level)]
 df = df[(df['Age'] >= selected_age_range[0]) & (df['Age'] <= selected_age_range[1])]
 
-# KPI Cards
 st.subheader("📈 Key Performance Indicators")
 col1, col2, col3, col4 = st.columns(4)
 
@@ -62,10 +61,10 @@ with col4:
     avg_years = df['YearsAtCompany'].mean()
     st.metric("Rata-rata Lama Bekerja", f"{avg_years:.1f} Tahun")
 
-# Visualisasi
+st.divider()
+
 st.subheader("📊 Analisis Visual")
 
-# Baris 1: Attrition dan Distribusi Usia
 col1, col2 = st.columns(2)
 
 with col1:
@@ -78,7 +77,8 @@ with col2:
     age_attrition = df.groupby(['Age', 'Attrition']).size().unstack()
     st.bar_chart(age_attrition)
 
-# Baris 2: Kepuasan Kerja dan Gaji
+st.divider()
+
 col3, col4 = st.columns(2)
 
 with col3:
@@ -91,14 +91,14 @@ with col4:
     job_income = df.groupby('JobLevel')['MonthlyIncome'].mean()
     st.bar_chart(job_income)
 
-# Baris 3: Heatmap Korelasi
+st.divider()
+
 st.subheader("🔥 Analisis Korelasi")
 numeric_cols = df.select_dtypes(include=[np.number]).columns
 correlation = df[numeric_cols].corr()
 st.write("Korelasi antar Variabel Numerik")
 st.dataframe(correlation.round(2))
 
-# Tambahkan penjelasan korelasi
 st.write("""
 Interpretasi Korelasi:
 - Nilai mendekati 1: Korelasi positif kuat
@@ -106,10 +106,10 @@ Interpretasi Korelasi:
 - Nilai mendekati 0: Tidak ada korelasi
 """)
 
-# Analisis Statistik
+st.divider()
+
 st.subheader("📊 Analisis Statistik")
 
-# Analisis berdasarkan Departemen
 st.write("Analisis berdasarkan Departemen")
 dept_analysis = df.groupby('Department').agg({
     'Attrition': lambda x: (x == 'Yes').mean() * 100,
@@ -121,7 +121,6 @@ dept_analysis = df.groupby('Department').agg({
 st.write("Statistik per Departemen:")
 st.dataframe(dept_analysis)
 
-# Analisis berdasarkan Level Jabatan
 st.write("Analisis berdasarkan Level Jabatan")
 job_level_analysis = df.groupby('JobLevel').agg({
     'Attrition': lambda x: (x == 'Yes').mean() * 100,
@@ -133,7 +132,8 @@ job_level_analysis = df.groupby('JobLevel').agg({
 st.write("Statistik per Level Jabatan:")
 st.dataframe(job_level_analysis)
 
-# Penjelasan Dashboard
+st.divider()
+
 with st.expander("ℹ️ Penjelasan Dashboard"):
     st.markdown("""
     NAMA ANGOTA KELOMPOK :
