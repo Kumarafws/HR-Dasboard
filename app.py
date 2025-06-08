@@ -1,7 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
@@ -74,40 +72,34 @@ st.subheader("📊 Analisis Visual")
 col1, col2 = st.columns(2)
 
 with col1:
-    fig1 = px.pie(df, names='Attrition', title='Persentase Attrition', 
-                  color_discrete_sequence=px.colors.qualitative.Set3)
-    st.plotly_chart(fig1, use_container_width=True)
+    st.write("Persentase Attrition")
+    attrition_counts = df['Attrition'].value_counts()
+    st.bar_chart(attrition_counts)
 
 with col2:
-    fig2 = px.histogram(df, x='Age', color='Attrition', 
-                       title='Distribusi Usia vs Attrition',
-                       barmode='group',
-                       color_discrete_sequence=px.colors.qualitative.Set3)
-    st.plotly_chart(fig2, use_container_width=True)
+    st.write("Distribusi Usia vs Attrition")
+    age_attrition = df.groupby(['Age', 'Attrition']).size().unstack()
+    st.bar_chart(age_attrition)
 
 # Baris 2: Kepuasan Kerja dan Gaji
 col3, col4 = st.columns(2)
 
 with col3:
-    fig3 = px.box(df, x='Department', y='JobSatisfaction', color='Attrition',
-                  title='Kepuasan Kerja per Departemen',
-                  color_discrete_sequence=px.colors.qualitative.Set3)
-    st.plotly_chart(fig3, use_container_width=True)
+    st.write("Kepuasan Kerja per Departemen")
+    dept_satisfaction = df.groupby('Department')['JobSatisfaction'].mean()
+    st.bar_chart(dept_satisfaction)
 
 with col4:
-    fig4 = px.box(df, x='JobLevel', y='MonthlyIncome', color='Attrition',
-                  title='Distribusi Gaji per Level Jabatan',
-                  color_discrete_sequence=px.colors.qualitative.Set3)
-    st.plotly_chart(fig4, use_container_width=True)
+    st.write("Distribusi Gaji per Level Jabatan")
+    job_income = df.groupby('JobLevel')['MonthlyIncome'].mean()
+    st.bar_chart(job_income)
 
 # Baris 3: Heatmap Korelasi
 st.subheader("🔥 Analisis Korelasi")
 numeric_cols = df.select_dtypes(include=[np.number]).columns
 correlation = df[numeric_cols].corr()
-fig5 = px.imshow(correlation,
-                 title='Korelasi antar Variabel Numerik',
-                 color_continuous_scale='RdBu')
-st.plotly_chart(fig5, use_container_width=True)
+st.write("Korelasi antar Variabel Numerik")
+st.dataframe(correlation.style.background_gradient(cmap='RdBu'))
 
 # Analisis Prediktif
 st.subheader("🔮 Analisis Prediktif Attrition")
@@ -138,12 +130,8 @@ feature_importance = pd.DataFrame({
     'Penting': model.feature_importances_
 }).sort_values('Penting', ascending=False)
 
-fig6 = px.bar(feature_importance, x='Fitur', y='Penting',
-              title='Faktor-faktor yang Mempengaruhi Attrition',
-              color='Penting',
-              color_continuous_scale='Viridis')
-st.plotly_chart(fig6, use_container_width=True)
-
+st.write("Faktor-faktor yang Mempengaruhi Attrition")
+st.bar_chart(feature_importance.set_index('Fitur'))
 
 # Penjelasan Dashboard
 with st.expander("ℹ️ Penjelasan Dashboard"):
@@ -161,16 +149,15 @@ with st.expander("ℹ️ Penjelasan Dashboard"):
       Menampilkan indikator kunci seperti tingkat attrition, rata-rata gaji bulanan, rata-rata kepuasan kerja, dan rata-rata lama bekerja. Informasi ini membantu manajemen memantau kesehatan organisasi secara umum dan mendeteksi area yang memerlukan perhatian khusus.
 
     - **Visualisasi Attrition & Distribusi Usia:**  
-      Pie chart dan histogram memberikan gambaran cepat tentang proporsi karyawan yang keluar dan distribusi usia karyawan. Ini penting untuk memahami kelompok usia mana yang paling rentan terhadap attrition dan merancang program retensi yang tepat sasaran.
+      Bar chart memberikan gambaran cepat tentang proporsi karyawan yang keluar dan distribusi usia karyawan. Ini penting untuk memahami kelompok usia mana yang paling rentan terhadap attrition dan merancang program retensi yang tepat sasaran.
 
     - **Kepuasan Kerja & Distribusi Gaji:**  
-      Box plot memperlihatkan variasi kepuasan kerja dan distribusi gaji di berbagai departemen dan level jabatan. Data ini membantu manajemen dalam mengevaluasi keadilan kompensasi dan efektivitas program peningkatan kepuasan kerja.
+      Bar chart memperlihatkan variasi kepuasan kerja dan distribusi gaji di berbagai departemen dan level jabatan. Data ini membantu manajemen dalam mengevaluasi keadilan kompensasi dan efektivitas program peningkatan kepuasan kerja.
 
     - **Heatmap Korelasi:**  
       Menunjukkan hubungan antar variabel numerik, seperti hubungan antara lama bekerja, pendapatan, dan kepuasan kerja. Korelasi ini dapat digunakan untuk menemukan faktor-faktor yang paling berpengaruh terhadap attrition atau performa.
 
     - **Analisis Prediktif Attrition:**  
       Menggunakan model machine learning untuk mengidentifikasi faktor-faktor utama yang mempengaruhi kemungkinan karyawan keluar. Hasil ini dapat digunakan untuk merancang intervensi yang lebih efektif, seperti pelatihan, promosi, atau penyesuaian gaji.
-
     """)
 
